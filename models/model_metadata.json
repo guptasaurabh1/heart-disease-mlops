@@ -1,6 +1,6 @@
 {
   "model_type": "xgboost",
-  "trained_at": "2026-07-11T19:47:20.953978+00:00",
+  "trained_at": "2026-07-11T20:22:58.266048+00:00",
   "feature_columns": [
     "age",
     "trestbps",

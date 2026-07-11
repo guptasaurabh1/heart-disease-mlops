@@ -2,8 +2,6 @@ Clean Video Show Script
 Phase 0 — Clean Slate
 source /Users/saurabhgupta/Documents/python/heart-disease-mlops/.venv/bin/activate && rm -rf /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/mlruns/ && rm -f /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/mlflow.db && rm -rf /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/models/ && echo "Done — clean slate"
 rm -rf mlruns
-mlflow ui --backend-store-uri sqlite:///mlflow.db
-
 
 # Activate environment
 source /Users/saurabhgupta/Documents/python/heart-disease-mlops/.venv/bin/activate
@@ -45,6 +43,8 @@ Phase 5 — Docker (API only)
 # Build image
 docker build -t heart-disease-api:latest -f docker/Dockerfile .
 
+docker images heart-disease-api
+
 # Run container
 docker run --rm -p 8000:8000 heart-disease-api:latest
 Second terminal — same smoke test as Phase 4. Stop with Ctrl+C.
@@ -83,3 +83,53 @@ Notes for clean video recording
 Before starting: delete mlruns/, models/model.joblib, models/model_metadata.json, and mlflow.db for a fresh demo
 The MLflow tracking URI in src/config.py is file-based (./mlruns), so mlflow ui --backend-store-uri ./mlruns is the right command
 The .venv is in the other repo at /Users/saurabhgupta/Documents/python/heart-disease-mlops/
+
+
+Phase 10 — Kubernetes on Docker Desktop
+
+Prerequisite: Enable Kubernetes in Docker Desktop → Settings → Kubernetes → "Enable Kubernetes" → Apply & Restart (do this before recording; it takes 2-3 minutes)
+
+
+# 1. Verify kubectl is pointing at Docker Desktop's cluster
+kubectl config use-context docker-desktop
+kubectl cluster-info
+
+# 2. Confirm the image exists locally (built in Phase 5/6)
+docker images heart-disease-api:latest
+
+# 3. Deploy to Kubernetes
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# 4. Watch pods come up
+kubectl get pods -w
+# Press Ctrl+C once both pods are Running
+
+# 5. Check the service (LoadBalancer gets a localhost IP on Docker Desktop)
+kubectl get svc heart-api
+# Docker Desktop assigns localhost:80 for LoadBalancer services
+
+# 6. Smoke test via Kubernetes
+curl -s http://localhost/health | jq
+curl -s -X POST http://localhost/predict \
+  -H "Content-Type: application/json" \
+  -d '{"age":63,"sex":1,"cp":4,"trestbps":145,"chol":233,"fbs":1,"restecg":2,"thalach":150,"exang":0,"oldpeak":2.3,"slope":3,"ca":0,"thal":6}' | jq
+
+# 7. Check logs
+kubectl logs -l app=heart-api --tail=50
+
+# 8. (Optional) Deploy via Helm instead of raw kubectl
+# helm install heart-api ./k8s/helm/heart-api
+
+# 9. Clean up when done
+kubectl delete -f k8s/deployment.yaml
+kubectl delete -f k8s/service.yaml
+What to show in the video:
+
+Docker Desktop → Settings → Kubernetes → check it's enabled (a quick glance)
+kubectl config use-context docker-desktop
+kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml
+kubectl get pods -w — watch both pods reach Running
+kubectl get svc heart-api — show localhost as external IP
+curl http://localhost/health | jq and the predict call
+kubectl delete -f k8s/deployment.yaml -f k8s/service.yaml for cleanup

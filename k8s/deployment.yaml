@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: heart-api
-          image: ghcr.io/guptasaurabh1/heart-disease-mlops:latest
-          imagePullPolicy: Always
+          image: heart-disease-api:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           resources:

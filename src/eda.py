@@ -119,7 +119,7 @@ def plot_relationships(df: pd.DataFrame) -> None:
     # oldpeak distribution by class
     data = [df.loc[df[config.TARGET] == 0, "oldpeak"].dropna(),
             df.loc[df[config.TARGET] == 1, "oldpeak"].dropna()]
-    axes[1].boxplot(data, labels=["No disease", "Disease"], patch_artist=True,
+    axes[1].boxplot(data, tick_labels=["No disease", "Disease"], patch_artist=True,
                     boxprops=dict(facecolor="#4C72B0", alpha=0.6))
     axes[1].set_ylabel("ST depression (oldpeak)")
     axes[1].set_title("Exercise ST depression by class")

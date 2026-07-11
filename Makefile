@@ -34,7 +34,7 @@ compose-up:
 	docker compose up --build
 
 mlflow-ui:
-	mlflow ui --backend-store-uri ./mlruns
+	PYTHONWARNINGS=ignore::FutureWarning mlflow ui --backend-store-uri sqlite:///mlflow.db
 
 clean:
 	rm -rf mlruns __pycache__ .pytest_cache .ruff_cache

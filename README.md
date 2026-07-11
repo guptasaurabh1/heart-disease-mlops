@@ -43,7 +43,7 @@ python -m src.eda                         # write reports/figures/*.png
 python -m src.train                       # train, tune, log to MLflow, save model
 
 # 3. Inspect experiments
-mlflow ui --backend-store-uri ./mlruns    # http://localhost:5000
+PYTHONWARNINGS=ignore::FutureWarning mlflow ui --backend-store-uri sqlite:///mlflow.db  # http://localhost:5000
 
 # 4. Serve locally
 uvicorn api.main:app --reload             # http://localhost:8000/docs

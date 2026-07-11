@@ -1,0 +1,85 @@
+Clean Video Show Script
+Phase 0 — Clean Slate
+source /Users/saurabhgupta/Documents/python/heart-disease-mlops/.venv/bin/activate && rm -rf /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/mlruns/ && rm -f /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/mlflow.db && rm -rf /Users/saurabhgupta/Documents/python/2024AC05396_SaurabhGupta_MLOps_Assignment01/models/ && echo "Done — clean slate"
+rm -rf mlruns
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+
+
+# Activate environment
+source /Users/saurabhgupta/Documents/python/heart-disease-mlops/.venv/bin/activate
+
+# Prepare data + run EDA
+python -m src.data_prep
+python -m src.eda
+Phase 2 — Train with MLflow Tracking
+
+# Train 4 models (LR, RF, XGB, SVM) — logs to MLflow automatically
+python -m src.train
+Phase 3 — MLflow UI
+
+# Launch MLflow (uses file-based tracking from config)
+PYTHONWARNINGS=ignore::FutureWarning mlflow ui --backend-store-uri sqlite:///mlflow.db
+# Open: http://localhost:5000
+Stop with Ctrl+C when done recording.
+
+Phase 4 — Serve API Locally
+
+# Start the FastAPI server
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+lsof -ti:8000 | xargs kill -9
+In a second terminal:
+
+
+# Smoke test
+bash scripts/smoke_test.sh
+
+# Or manually
+curl -s http://localhost:8000/health | jq
+curl -s -X POST localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"age":63,"sex":1,"cp":4,"trestbps":145,"chol":233,"fbs":1,"restecg":2,"thalach":150,"exang":0,"oldpeak":2.3,"slope":3,"ca":0,"thal":6}' | jq
+Stop the API (Ctrl+C).
+
+Phase 5 — Docker (API only)
+
+# Build image
+docker build -t heart-disease-api:latest -f docker/Dockerfile .
+
+# Run container
+docker run --rm -p 8000:8000 heart-disease-api:latest
+Second terminal — same smoke test as Phase 4. Stop with Ctrl+C.
+
+Phase 6 — Full Stack (Docker Compose)
+
+# Start API + Prometheus + Grafana
+docker compose up --build
+Access points:
+
+Service	URL
+API docs	http://localhost:8000/docs
+Health	http://localhost:8000/health
+Prometheus	http://localhost:9090
+Grafana	http://localhost:3000 (admin/admin)
+Phase 7 — Generate Traffic
+In a second terminal while compose is running:
+
+
+# Hit the API 200 times to populate metrics
+for i in $(seq 1 200); do
+  curl -s -X POST localhost:8000/predict \
+    -H "Content-Type: application/json" \
+    -d '{"age":63,"sex":1,"cp":4,"trestbps":145,"chol":233,"fbs":1,"restecg":2,"thalach":150,"exang":0,"oldpeak":2.3,"slope":3,"ca":0,"thal":6}' >/dev/null
+done
+Phase 8 — Dashboards
+Show these in the video:
+
+Prometheus → http://localhost:9090 — query api_requests_total
+Grafana → http://localhost:3000 — "Heart Disease API" dashboard shows request rate, latency, prediction counts
+Phase 9 — Cleanup
+
+# Stop containers, remove volumes
+docker compose down -v
+Notes for clean video recording
+Before starting: delete mlruns/, models/model.joblib, models/model_metadata.json, and mlflow.db for a fresh demo
+The MLflow tracking URI in src/config.py is file-based (./mlruns), so mlflow ui --backend-store-uri ./mlruns is the right command
+The .venv is in the other repo at /Users/saurabhgupta/Documents/python/heart-disease-mlops/

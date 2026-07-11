@@ -43,8 +43,12 @@ class PredictionResponse(BaseModel):
     risk_band: str = Field(..., description="low / moderate / high")
     model_type: Optional[str] = None
 
+    model_config = {"protected_namespaces": ()}
+
 
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool
     model_type: Optional[str] = None
+
+    model_config = {"protected_namespaces": ()}

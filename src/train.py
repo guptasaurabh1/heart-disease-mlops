@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import warnings
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
@@ -51,6 +52,12 @@ from xgboost import XGBClassifier
 from src import config, data_prep
 from src.preprocessing import build_pipeline
 
+# Squelch chatty MLflow internals during training.
+logging.getLogger("mlflow.sklearn").setLevel(logging.ERROR)
+logging.getLogger("mlflow.tracking").setLevel(logging.ERROR)
+logging.getLogger("mlflow.store.db").setLevel(logging.WARNING)
+warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
+
 logger = logging.getLogger(__name__)
 
 
@@ -73,7 +80,6 @@ def candidates() -> list[Candidate]:
             estimator=LogisticRegression(max_iter=3000, class_weight="balanced"),
             param_dist={
                 "model__C": loguniform(1e-2, 5e1),
-                "model__penalty": ["l2"],
                 "model__solver": ["lbfgs", "saga"],
             },
             n_iter=12,

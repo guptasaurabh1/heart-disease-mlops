@@ -66,4 +66,4 @@ CV_FOLDS = 5
 
 # MLflow
 MLFLOW_EXPERIMENT = "heart-disease-classification"
-MLFLOW_TRACKING_URI = str(PROJECT_ROOT / "mlruns")
+MLFLOW_TRACKING_URI = "sqlite:///" + str(PROJECT_ROOT / "mlflow.db")

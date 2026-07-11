@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mlflow-runs
-          path: mlruns/
+          path: mlflow.db
 
   docker:
     name: Build, push, and smoke-test container

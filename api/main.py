@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import time
+import warnings
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -35,6 +36,11 @@ logging.basicConfig(
     format='%(asctime)s level=%(levelname)s logger=%(name)s msg="%(message)s"',
 )
 logger = logging.getLogger("heart-api")
+
+# Suppress noisy warnings in a clean demo.
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+warnings.filterwarnings("ignore", message=".*InconsistentVersionWarning.*")
+warnings.filterwarnings("ignore", message=".*Trying to unpickle.*")
 
 
 @asynccontextmanager

@@ -33,10 +33,9 @@ import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
 from scipy.stats import loguniform, randint
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     RocCurveDisplay,
@@ -47,6 +46,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, train_test_split
+from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
 from src import config, data_prep

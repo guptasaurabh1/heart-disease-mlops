@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.git/
+.github/
+mlruns/
+notebooks/
+tests/
+reports/
+data/raw/
+k8s/
+monitoring/
+*.md
+.pytest_cache/
+.ruff_cache/

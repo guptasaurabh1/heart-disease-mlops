@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+mlruns/
+*.egg-info/
+.DS_Store
+.ipynb_checkpoints/
+# keep models/ and data/raw committed so the project runs out of the box
+node_modules/
+mlflow.db

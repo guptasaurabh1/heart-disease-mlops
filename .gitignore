@@ -9,5 +9,6 @@ mlruns/
 .DS_Store
 .ipynb_checkpoints/
 # keep models/ and data/raw committed so the project runs out of the box
+screenshots/
 node_modules/
 mlflow.db
